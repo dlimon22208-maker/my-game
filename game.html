@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>Dark Fantasy 3D Ultra 2K RPG — Ultimate Graphics</title>
+    <style><script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+</head>
+<body>
+
+    <div id="screen">
+        <div id="char-selection" class="overlay">
+            <h1>DARK FANTASY 2K ULTRA</h1>
+            
+            <div class="room-controls">
+                <input type="text" id="room-id" value="DUNGEON777">
+                <button onclick="startMultiplayer(true)">Создать комнату (ПК)</button>
+                <button onclick="startMultiplayer(false)">Войти в комнату (Телефон)</button>
+            </div>
+
+            <div class="hero-list">
+                <div class="hero-card" onclick="selectClass(0x00ffff, 'Kenter Keer')"><h4 style="color: #00ffff; margin:0 0 5px 0;">Kenter Keer</h4><span style="font-size:0.7em;color:#8a8296;">Неоновый кристалл</span></div>
+                <div class="hero-card" onclick="selectClass(0xff3300, 'Garudion')"><h4 style="color: #ff3300; margin:0 0 5px 0;">Garudion</h4><span style="font-size:0.7em;color:#8a8296;">Магматический пик</span></div>
+                <div class="hero-card" onclick="selectClass(0xda70d6, 'Lyubaimus')"><h4 style="color: #da70d6; margin:0 0 5px 0;">Lyubaimus</h4><span style="font-size:0.7em;color:#8a8296;">Аметистовый рунник</span></div>
+            </div>
+            <p id="info-text" style="color: #615773; font-size: 0.8em;">Синхронизация P2P по сети. Полное 2K качество со сложными шейдерами теней и травы.</p>
+        </div>
+
+        <div id="game-hud" class="hud">
+            <div style="font-weight: bold; color: #ffcc00; letter-spacing: 1px;">ULTRA GRAPHICS CO-OP</div>
+            <div>Комната: <span id="hud-zone" style="color:#00ffff;">1</span> | Врагов: <span id="hud-mobs" style="color:#ff3333;">0</span></div>
+            <div style="font-size: 0.8em; margin-top: 5px; color: #ccc;">Ваше здоровье: <span id="my-hp" style="color:#00ff00; font-weight:bold;">8/8</span> | Зелья: <span id="my-pots">3</span></div>
+        </div>
+        <div id="logs"></div>
+
+        <div id="mobile-hud">
+            <div class="joystick-base" id="joy-base"><div class="joystick-stick" id="joy-stick"></div></div>
+            <div class="btn-group">
+                <div class="touch-btn" id="btn-hit">УДАР</div>
+                <div class="touch-btn" id="btn-heal">ХИЛ</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let me = { id: '', name: 'Игрок', color: 0x00ffff, hp: 8, potions: 3, x: 0, z: 15, rotY: 0, mesh: null };
+        let teammate = { id: '', mesh: null, x: 0, z: 15, rotY: 0 };
+        let game = { currentZone: 1, mobsLeft: 0, active: false, isHost: false };
+        let keys = { w: false, a: false, s: false, d: false };
+        let mobileMove = { x: 0, y: 0 };
+        let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || ('ontouchstart' in window);
+game.isHost = isHost;
+            document.getElementById('info-text').innerText = "Построение графического ядра...";
+
+            if (isHost) {
+                peer = new Peer(roomId);
+                peer.on('open', () => { document.getElementById('info-text').innerHTML = `<b style="color:#00ff00">Комната создана на ПК!</b> Подключите телефон...`; });
+                peer.on('connection', (conn) => { connection = conn; setupNetworkListeners(); initGameWorld(); });
+            } else {
+                peer = new Peer();
+                peer.on('open', () => { connection = peer.connect(roomId); setupNetworkListeners(); });
+            }
+        }
+
+        function setupNetworkListeners() {
+            connection.on('open', () => { initGameWorld(); });
+            connection.on('data', (data) => {
+                if (data.type === 'move' && teammate.mesh) {
+                    teammate.mesh.position.set(data.x, 1.2, data.z);
+                    teammate.mesh.rotation.y = data.rotY;
+                }
+                if (data.type === 'initHero') { createTeammateMesh(data.color); logMessage(`Напарник подключился!`); }
+                if (data.type === 'spawnZone') { game.currentZone = data.zone; syncZoneGeneration(data.enemyPositions, data.isBoss); }
+                if (data.type === 'enemyHit' && enemies[data.index]) {
+                    enemies[data.index].hp -= data.dmg;
+                    createHitParticles(enemies[data.index].mesh.position);
+                    if(enemies[data.index].hp <= 0) {
+                        scene.remove(enemies[data.index].mesh);
+                        game.mobsLeft--; document.getElementById('hud-mobs').innerText = game.mobsLeft;
+                        if(game.mobsLeft <= 0) spawnChest();
+                    }
+                }
+                if (data.type === 'chestOpened') {
+        let lootPool = ["Древний клинок", "Осколок руны", "Теневой амулет", "Шлем бездны", "Кольцо зари", "Амулет смерти"];
+        let droppedLoot = [];
+
+        let scene, camera, renderer, clock = new THREE.Clock();
+        let enemies = [], bossMesh = null, chestMesh = null, grassMesh = null, particleSystem = null;
+        let peer = null, connection = null;
+
+        // Позиции для деформации травы (инпуты для видеокарты)
+        let grassPositions = []; 
+
+        function logMessage(text) {
+            const el = document.getElementById('logs');
+            el.innerHTML += `<div>${text}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function selectClass(color, name) {
+            me.color = color; me.name = name;
+            document.querySelectorAll('.hero-card').forEach(c => c.style.borderColor = '#1a1326');
+            event.currentTarget.style.borderColor = '#ff0000';
+            logMessage(`Выбран: ${name}`);
+        }
+
+        function startMultiplayer(isHost) {
+            let roomId = document.getElementById('room-id').value.trim();
+            if(!roomId) return alert("Введите имя комнаты!");
+        body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Courier New', monospace; background: #010002; color: #fff; user-select: none; touch-action: none; }
+        #screen { width: 100vw; height: 100vh; position: relative; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(3,2,6,0.97); z-index: 20; text-align: center; }
+        h1 { color: #8b0000; text-shadow: 0 0 25px #ff0000; font-size: 2.5em; margin: 0 10px 15px 10px; font-weight: bold; letter-spacing: 3px; }
+        
+        .room-controls { background: #07050d; padding: 25px; border: 2px solid #1a1326; border-radius: 8px; margin-bottom: 25px; display: flex; flex-direction: column; gap: 12px; width: 300px; box-shadow: 0 0 35px rgba(0,0,0,0.8); }
+        .room-controls input { background: #110b1a; border: 1px solid #2d1f3d; padding: 12px; color: #fff; font-family: inherit; text-align: center; font-size: 1.1em; border-radius: 4px; outline: none; }
+        .room-controls button { background: #700000; border: 1px solid #990000; padding: 12px; color: #fff; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 1em; border-radius: 4px; transition: 0.2s; }
+        .room-controls button:hover { background: #b00000; box-shadow: 0 0 20px rgba(255,0,0,0.6); }
+
+        .hero-list { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-width: 90%; margin-bottom: 20px; }
+        .hero-card { border: 2px solid #1a1326; padding: 15px; width: 130px; text-align: center; cursor: pointer; background: #07050d; font-size: 0.95em; transition: 0.2s; border-radius: 4px; }
+        .hero-card:hover { border-color: #ff0000; box-shadow: 0 0 25px rgba(255,0,0,0.6); transform: translateY(-2px); }
+
+        .hud { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(4,2,8,0.95); padding: 12px 25px; border: 1px solid #2d1f3d; border-radius: 6px; font-size: 0.9em; pointer-events: none; display: none; z-index: 10; text-align: center; min-width: 270px; box-shadow: 0 0 25px rgba(0,0,0,0.9); }
+        #logs { position: absolute; top: 130px; left: 50%; transform: translateX(-50%); width: 310px; max-height: 95px; overflow-y: auto; background: rgba(4,2,8,0.75); border: 1px solid #2d1f3d; border-radius: 6px; padding: 8px; font-size: 0.75em; color: #bbb; display: none; pointer-events: none; z-index: 9; }
+
+        #mobile-hud { position: absolute; bottom: 35px; left: 0; width: 100%; height: 160px; z-index: 15; display: none; pointer-events: none; }
+        .joystick-base { position: absolute; bottom: 10px; left: 35px; width: 115px; height: 115px; background: rgba(255,255,255,0.02); border: 2px solid rgba(0,255,255,0.3); border-radius: 50%; pointer-events: auto; box-shadow: inset 0 0 15px rgba(0,255,255,0.1); }
+        .joystick-stick { position: absolute; top: 37px; left: 37px; width: 40px; height: 40px; background: rgba(0,255,255,0.4); border: 1px solid #00ffff; border-radius: 50%; box-shadow: 0 0 15px #00ffff; }
+        .btn-group { position: absolute; bottom: 25px; right: 35px; display: flex; gap: 20px; pointer-events: auto; }
+        .touch-btn { width: 68px; height: 68px; color: white; border-radius: 50%; font-weight: bold; font-size: 0.85em; display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        #btn-hit { background: rgba(139,0,0,0.6); border: 2px solid #ff0000; text-shadow: 0 0 5px #fff; }
+        #btn-heal { background: rgba(0,100,0,0.6); border: 2px solid #00ff00; text-shadow: 0 0 5px #fff; }
+    </style>

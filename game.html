@@ -1,15 +1,9 @@
-// 1. Находим кнопку на странице
-const startButton = document.getElementById('start-btn');
-
-// 2. Создаем функцию, которая запустит тест графики
-function startBenchmark() {
-    console.log("Тест графики запущен!");
-    // Сюда вставь свой код, который запускает 3D-треугольники
+script>
+// 1. Создаем функцию, которую ищет твоя кнопка
+function startSinglePlayer() {
+    console.log("Игра запускается...");
+    
+    // Сюда ниже вставляй код своей игры (логику, графику, 3D-треугольники)
+    alert("Тест запущен успешно!"); 
 }
-
-// 3. Вешаем на кнопку событие клика
-if (startButton) {
-    startButton.addEventListener('click', startBenchmark);
-} else {
-    console.error("Кнопка с id 'start-btn' не найдена на странице!");
-}
+</script>

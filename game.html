@@ -32,7 +32,9 @@
             <div>Комната: <span id="hud-zone" style="color:#00ffff;">1</span> | Врагов: <span id="hud-mobs" style="color:#ff3333;">0</span></div>
             <div style="font-size: 0.8em; margin-top: 5px; color: #ccc;">Здоровье: <span id="my-hp" style="color:#00ff00; font-weight:bold;">8/8</span></div>
         </div>
-    </div>scene.add(new THREE.AmbientLight(0x0a0615, 0.9));
+    </div>
+
+    <script>scene.add(new THREE.AmbientLight(0x0a0615, 0.9));
             let sunLight = new THREE.DirectionalLight(0x402560, 3.0);
             sunLight.position.set(30, 50, 20);
             sunLight.castShadow = true;
@@ -80,7 +82,8 @@
                     `#include <begin_vertex>`,
                     `
                     #include <begin_vertex>
-                    float wave = sin(uTime * 3.0 + position.x * 1.5 + positigame.mobsLeft = 5;
+                    float wave = sin(uTime * 3.0 + position.x * 1.5 + position.z * 1.5) * 0.25 * position.y;
+                    transformed.x += wave;game.mobsLeft = 5;
             document.getElementById('hud-mobs').innerText = game.mobsLeft;
             for(let i = 0; i < game.mobsLeft; i++) {
                 let mesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), new THREE.MeshStandardMaterial({ color: 0x4a0e17 }));
@@ -117,8 +120,6 @@
         }
     </script>
 </body>
-</html>on.z * 1.5) * 0.25 * position.y;
-                    transformed.x += wave;
                     transformed.z += wave * 0.4;
                     vec4 worldPos = instanceMatrix * vec4(position, 1.0);
                     float distP = distance(worldPos.xyz, uPlayerPos);
@@ -145,8 +146,6 @@
         }
 
         function generateLocalZone() {
-
-    <script>
         let me = { color: 0x00ffff, hp: 8, mesh: null };
         let game = { currentZone: 1, mobsLeft: 0, active: false };
         let keys = { w: false, a: false, s: false, d: false };

@@ -1,14 +1,52 @@
-<!-- Сама кнопка на экране -->
-<button onclick="startSinglePlayer()" style="padding: 15px 30px; font-size: 20px; background-color: #ff0000; color: white; border: none; cursor: pointer; border-radius: 5px;">
-    ИГРАТЬ (ТЕСТ ГРАФИКИ 2К)
-</button>
+using UnityEngine;
+using Unity.Netcode; // Нужен установленный пакет Netcode for GameObjects
+using System.Collections.Generic;
 
-<!-- Код, который запускается при нажатии -->
-<script>
-function startSinglePlayer() {
-    console.log("Кнопка успешно работает!");
-    alert("Кнопка сработала!");
-    
-    // Сюда дальше можно будет вернуть твою графику
+public class GameChatManager : NetworkBehaviour
+{
+    [Header("Настройки спавна")]
+    public GameObject mobPrefab;  // Сюда в Unity перетащи модельку моба
+    public GameObject bossPrefab; // Сюда перетащи модельку босса
+
+    // Эта функция вызывается, когда игрок отправляет сообщение в чат
+    [ServerRpc(RequireOwnership = false)]
+    public void SendChatMessageServerRpc(string message, Vector3 playerPosition)
+    {
+        // Переводим текст в нижний регистр, чтобы пробелы или заглавные буквы не ломали команду
+        string cleanMessage = message.Trim().ToLower();
+
+        if (cleanMessage == "/монстр")
+        {
+            SpawnMobWave(playerPosition);
+        }
+        else if (cleanMessage == "/босс где")
+        {
+            SpawnBossMonster(playerPosition);
+        }
+    }
+
+    // Спавн ровно 100 мобов пачкой вокруг игрока
+    private void SpawnMobWave(Vector3 spawnCenter)
+    {
+        if (!IsServer) return; // Спавнить мобов может только сервер (Хост)
+
+        Debug.Log("Призыв 100 монстров в Бездну!");
+
+        for (int i = 0; i ().Spawn();
+        }
+    }
+
+    // Спавн 1 босса по команде
+    private void SpawnBossMonster(Vector3 spawnCenter)
+    {
+        if (!IsServer) return;
+
+        // Босс появляется чуть впереди игрока (в 5 метрах)
+        Vector3 spawnPos = spawnCenter + Vector3.forward * 5f;
+
+        GameObject obj = Instantiate(bossPrefab, spawnPos, Quaternion.identity);
+        obj.GetComponent<NetworkObject>().Spawn();
+
+        Debug.Log("БОСС ПРИБЫЛ НА АРЕНУ!");
+    }
 }
-</script>
